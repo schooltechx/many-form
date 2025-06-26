@@ -1,0 +1,10 @@
+services:
+  n8n-chat:
+    image: docker.frappet.com/demo/many-form
+    ports:
+        - 3000:3000
+
+    environment:
+      - TZ=${TIMEZONE}
+      - PUBLIC_N8N_CHAT_URL=${PUBLIC_N8N_CHAT_URL}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
