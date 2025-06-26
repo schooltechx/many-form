@@ -33,11 +33,13 @@ npm run dev
 ใช้ windows.speechRecognition ที่มากับ Browser ใช้ได้ฟรี และทำงานดีด้วย
 
 ## Text to Speech(TTS)
-TTS ที่มากับ Chrome ไม่รองรับภาษาไทย บน Firefox มีภาษาไทยแต่ก็ค่อนข้างย่ำแย่ แนะนำให้ใช้ตัวอื่น
-- Microsoft Edge TTS รองรับหลายภาษาสำหรับภาษาไทยมีสองเสียงคือ NiwatNeural(ชาย) PremwadeeNeural(หญิง) (แอบ)
-ใช้ได้ฟรีใช้ผ่าน [@andresaya/edge-tts](https://github.com/andresayac/edge-tts)
-- Google gemini-2.5-flash-preview-tts ต้องขอ API_KEY ก่อน ใช้ได้ฟรีระดับหนึ่ง ติดตั้ง
-[@google/genai](https://ai.google.dev/gemini-api/docs/speech-generation?hl=th) ก่อนใช้งาน
+- Browser TTS ที่มากับ Chrome ไม่รองรับภาษาไทย บน Firefox มีภาษาไทยแต่ก็ค่อนข้างย่ำแย่ แนะนำให้ใช้ตัวอื่น ทดสอบได้[ที่นี้](https://codepen.io/ve3/pen/MYWzEwg)
+- Microsoft Edge TTS รองรับหลายภาษาสำหรับภาษาไทยมีสองเสียงคือ th-TH-NiwatNeural(ชาย), th-TH-PremwadeeNeural(หญิง) (แอบ) ใช้ได้ฟรีใช้ผ่าน [@andresaya/edge-tts](https://github.com/andresayac/edge-tts)
+ทดสอบได้[ที่นี้](https://huggingface.co/spaces/innoai/Edge-TTS-Text-to-Speech)
+- Google gemini-2.5-flash-preview-tts รองรับเสียงภาษาไทยได้หลายแบบ ต้องขอ 
+[API Key](https://aistudio.google.com/app/apikey) ก่อน ใช้ได้ฟรีระดับหนึ่ง ติดตั้ง
+[@google/genai](https://ai.google.dev/gemini-api/docs/speech-generation?hl=th) ก่อนใช้งาน 
+ทดสอบได้[ที่นี้](https://aistudio.google.com/generate-speech)
 
 ## N8N
 ติดตั้งแบบ self-host บนอินเตอร์เน็ต

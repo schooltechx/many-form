@@ -15,7 +15,7 @@ export const GET: RequestHandler = async ({ url }) => {
 
   console.log(ttsType,voice)
   if(ttsType==='edge'){
-    voice = voice?? 'th-TH-PremwadeeNeural'//'th-TH-NiwatNeural'
+    voice = voice?? 'th-TH-NiwatNeural'//'th-TH-PremwadeeNeural'
     return new Response(await edgeTTS(text, voice), {
       status: 200,
       headers: { 'Content-Type': 'audio/mpeg' }
