@@ -1,16 +1,14 @@
-
 export type ChatWidgetConfig = {
-		webhook: {
-			url: string
-			route: string
-		},
-		ttsType: string,
-		style: {
-			primaryColor: string,
-			secondaryColor: string,
-			position: string,
-			backgroundColor: string,
-			fontColor: string
-		}
+	webhook: {
+		url: string;
+		route: string;
 	};
-
+	ttsType: string;
+	style: {
+		primaryColor: string;
+		secondaryColor: string;
+		position: string;
+		backgroundColor: string;
+		fontColor: string;
+	};
+};

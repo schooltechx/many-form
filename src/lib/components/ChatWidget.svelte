@@ -1,25 +1,21 @@
-
 <script>
-	
 	import { onMount } from 'svelte';
 	/**
 	 * @type {import("./types").ChatWidgetConfig}
 	 */
-	 export let chatWidgetConfig
-	let lastResponse = ''
-	let recognizing = false
+	export let chatWidgetConfig;
+	let lastResponse = '';
+	let recognizing = false;
 
 	/**
 	 * @type {{ lang: string; interimResults: boolean; maxAlternatives: number; onstart: () => void; onresult: (event: any) => void; onerror: (event: any) => void; onend: () => void; start: () => void; }}
 	 */
-	let recognition
+	let recognition;
 	/**
 	 * @type {HTMLAudioElement}
 	 */
-	let audio
+	let audio;
 	onMount(() => {
-
-	
 		if ('speechRecognition' in window || 'webkitSpeechRecognition' in window) {
 			// @ts-ignore
 			const SpeechRecognition = window.speechRecognition || window.webkitSpeechRecognition;
@@ -29,12 +25,12 @@
 			recognition.maxAlternatives = 1;
 			recognition.onstart = () => {
 				recognizing = true;
-				message = ''
+				message = '';
 			};
 			// @ts-ignore
 			recognition.onresult = (event) => {
 				recognizing = false;
-				message = event.results[0][0].transcript
+				message = event.results[0][0].transcript;
 			};
 			// @ts-ignore
 			recognition.onerror = (event) => {
@@ -44,42 +40,41 @@
 				recognizing = false;
 			};
 		}
-
-
 	});
 	/**
 	 * @param {string} text
 	 */
-	async function  speakText(text) {
-		if(chatWidgetConfig.ttsType === 'browser'){
+	async function speakText(text) {
+		if (chatWidgetConfig.ttsType === 'browser') {
 			var u = new SpeechSynthesisUtterance();
-			u.text = text
+			u.text = text;
 			u.lang = 'th-TH';
 			u.rate = 1.2;
 			speechSynthesis.speak(u);
-			return
+			return;
 		}
-		const res = await fetch(`/api/tts?ttsType=${chatWidgetConfig.ttsType}&text=${encodeURIComponent(text)}`);
+		const res = await fetch(
+			`/api/tts?ttsType=${chatWidgetConfig.ttsType}&text=${encodeURIComponent(text)}`
+		);
 		const blob = await res.blob();
 		let audioUrl = URL.createObjectURL(blob);
-		audio = new Audio(audioUrl)
+		audio = new Audio(audioUrl);
 		audio.onended = () => {
 			URL.revokeObjectURL(audioUrl); // Clean up the URL after playback
 		};
 		audio.play().catch((err) => {
 			console.error('Error playing audio:', err);
 		});
-
 	}
-	function toggleSpeak(){
+	function toggleSpeak() {
 		if (audio && !audio.paused) {
 			audio.pause(); // Pause if currently playing
 		} else {
-			speakText(lastResponse.trim()|| 'ยังไม่มีข้อความให้พูด'); // Speak the last response or a default message
+			speakText(lastResponse.trim() || 'ยังไม่มีข้อความให้พูด'); // Speak the last response or a default message
 		}
 	}
 	function listen() {
-		recognition.start()
+		recognition.start();
 	}
 	let showChatPanel = false;
 	let message = '';
@@ -156,16 +151,15 @@
 				bind:value={message}
 				placeholder="Type your message here..."
 			/>
-			<button class="chat-widget-send" on:click={send}>⌯⌲</button> 
+			<button class="chat-widget-send" on:click={send}>⌯⌲</button>
 			{#if recognition}
-			<button class="chat-widget-send" on:click={listen}>🎤</button>
+				<button class="chat-widget-send" on:click={listen}>🎤</button>
 			{/if}
 			{#if chatWidgetConfig.ttsType}
-			<button class="chat-widget-send" on:click={toggleSpeak}>⏯</button>
+				<button class="chat-widget-send" on:click={toggleSpeak}>⏯</button>
 			{/if}
 		</div>
 	</div>
-
 {/if}
 
 <style>
