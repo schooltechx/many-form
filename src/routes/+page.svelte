@@ -25,3 +25,8 @@
 		<li>แยก chat เป็น component lib/component/ChatWidget.svelte เพื่อใช้ซ้ำได้</li>
 	</ul>
 </div>
+
+<h2><a href="basic-q-and-a">Basic Question & Answer</a></h2>
+<div>
+	ต้นแบบสำหรับทำ Prompt ให้ AI ทำคำถามคำตอบ ตอนนี้ยังตอบเป็น json อยู่
+</div>

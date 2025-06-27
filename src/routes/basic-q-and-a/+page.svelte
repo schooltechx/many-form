@@ -4,11 +4,11 @@
 	/** @type {import('$lib/components/types').ChatWidgetConfig} */
 	let chatWidgetConfig = {
 		webhook: {
-			url: env.PUBLIC_N8N_CHAT_URL,
+			url: "https://ai-demo-dev.frappet.synology.me/webhook/f4495b47-362b-4ae4-9d0f-8a995525f969/chat",
 			route: 'general'
 		},
-		ttsType: 'edge',
-		welcomeMessage:"สวัสดี 👋, ถ้าจะคุยกับผม เริ่มได้เลยนะ?", 
+		ttsType: '',
+		welcomeMessage:"สวัสดีวันนี้มีอาการอย่างไรบ้างค่ะ? เริ่มต้นใหม่ให้พิมคำว่า reset", 
 		style: {
 			primaryColor: '#854fff',
 			secondaryColor: '#6b3fd4',
@@ -17,20 +17,6 @@
 			fontColor: '#333333'
 		}
 	};
-	const options = [
-		{
-			value: 'edge',
-			label: 'Eddge TTS'
-		},
-		{
-			value: 'gemini',
-			label: 'gemini-2.5-flash-preview-tts'
-		},
-		{
-			value: 'browser',
-			label: 'Browser'
-		}
-	];
 
 	/**
 	 * @param {{ currentTarget: { value: string; }; }} event
@@ -45,6 +31,15 @@
 	กดปุ่ม 💬 (ล่างขวา) เพื่อเปิดแชทวิดเจ็ต
 	<h2>Text To Speech</h2>
 	<div>
+		<label>
+			<input
+				checked={chatWidgetConfig.ttsType === ''}
+				on:change={onChange}
+				type="radio"
+				name="tts"
+				value="edge"
+			/> None
+		</label>
 		<label>
 			<input
 				checked={chatWidgetConfig.ttsType === 'edge'}

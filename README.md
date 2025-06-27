@@ -28,13 +28,13 @@ npm run dev
 ```
 
 ## Speech To Text (STT)
-ใช้ windows.speechRecognition ที่มากับ Browser ใช้ได้ฟรี และทำงานดีด้วย
+windows.speechRecognition ที่มากับ Browser ถอดเสียงได้ค่อนข้างแม่นยำ ใช้งานได้ฟรี เร็วกว่าเรียก API ภายนอกอย่าง whisper
 
 ## Text to Speech(TTS)
-- Browser TTS ที่มากับ Chrome ไม่รองรับภาษาไทย บน Firefox มีภาษาไทยแต่ก็ค่อนข้างย่ำแย่ แนะนำให้ใช้ตัวอื่น ทดสอบได้[ที่นี้](https://codepen.io/ve3/pen/MYWzEwg)
-- Microsoft Edge TTS รองรับหลายภาษาสำหรับภาษาไทยมีสองเสียงคือ th-TH-NiwatNeural(ชาย), th-TH-PremwadeeNeural(หญิง) (แอบ) ใช้ได้ฟรีใช้ผ่าน [@andresaya/edge-tts](https://github.com/andresayac/edge-tts)
-ทดสอบได้[ที่นี้](https://huggingface.co/spaces/innoai/Edge-TTS-Text-to-Speech)
-- Google gemini-2.5-flash-preview-tts รองรับเสียงภาษาไทยได้หลายแบบ ต้องขอ 
+- Browser TTS จะขึ้นกับแต่ละค่าย Chrome สร้างเสียงได้เร็วแต่ไม่รองรับภาษาไทย, บน Firefox มีภาษาไทยให้เลือกแต่เสียงค่อนข้างแย่, Brave ไม่มี ทดสอบได้[ที่นี้](https://codepen.io/ve3/pen/MYWzEwg) แนะนำให้ใช้ตัวอื่น
+- Microsoft Edge TTS เป็นฟีเจอร์ read around บน Browser ที่ถูกแอปเอามาใช้ในโปรแกรมอื่นๆหลายตัวเนื่องจากฟรี รองรับหลายภาษา สำหรับภาษาไทยมีสองเสียงคือ th-TH-NiwatNeural(ชาย), th-TH-PremwadeeNeural(หญิง) ตอนนี้ใช้ผ่าน [@andresaya/edge-tts](https://github.com/andresayac/edge-tts) ตัวนี้มีบักเล็กน้อยอาจจะเปลี่ยนเป็นตัวอื่น
+ทดสอบเสียงได้[ที่นี้](https://huggingface.co/spaces/innoai/Edge-TTS-Text-to-Speech)
+- Google gemini-2.5-flash-preview-tts รองรับเสียงภาษาไทยได้หลายแบบ สร้างเสียงได้ค่อนข้างช้า ต้องขอ 
 [API Key](https://aistudio.google.com/app/apikey) ก่อน ใช้ได้ฟรีระดับหนึ่ง ติดตั้ง
 [@google/genai](https://ai.google.dev/gemini-api/docs/speech-generation?hl=th) ก่อนใช้งาน 
 ทดสอบได้[ที่นี้](https://aistudio.google.com/generate-speech)
@@ -44,6 +44,7 @@ npm run dev
 - ทีมใช้เพื่อทดสอบ Prompt หรือโมเดลได้ง่าย ไม่ต้องเขียนโค้ด
 - เป็น AI Agent ทำงานเบื้องหลัง
 - เชื่อมต่อระบบอื่นๆเช่นส่งค่าเข้า Google Sheet
+
 ## SvelteKit
 ใช้เพื่อทำ 
 - สร้างหน้า Custom Chat เพื่อควบคุมการทำงานได้มากกว่า Chat ของ N8N ดัดแปลงมาจากตัวอย่างนี้ [video](https://www.youtube.com/watch?v=0KR8e4WP0E0), [codepen](https://codepen.io/Matt-Penny/pen/dPyVWEw)
@@ -52,5 +53,6 @@ npm run dev
 
 ## อ่านเพิ่ม
 - [speechSynthesis with Svelte](https://dev.to/taw/getting-started-with-web-speech-synthesis-api-and-svelte-3l13)
-
 - [@speechly/speech-recognition-polyfill](https://www.npmjs.com/package/@speechly/speech-recognition-polyfill)
+- [Conversational Interviews with AI Agents and n8n Forms](https://n8n.io/workflows/2566-conversational-interviews-with-ai-agents-and-n8n-forms/)
+

@@ -4,6 +4,7 @@ export type ChatWidgetConfig = {
 		route: string;
 	};
 	ttsType: string;
+	welcomeMessage: string;
 	style: {
 		primaryColor: string;
 		secondaryColor: string;

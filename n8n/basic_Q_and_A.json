@@ -1,0 +1,148 @@
+{
+  "name": "basic-Q-and-A",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "สวัสดีวันนี้มีอาการอย่างไรบ้างค่ะ ?",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -340,
+        0
+      ],
+      "id": "7624889d-0a38-4dbd-b771-3109b0f628e8",
+      "name": "When chat message received",
+      "webhookId": "f4495b47-362b-4ae4-9d0f-8a995525f969"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -180,
+        180
+      ],
+      "id": "eaeb2ee7-b63d-4fed-8ed6-7529a1307fb7",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "2VxJqgDVqRCnNWKB",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"title\": \"Patient Form \",\n  \"type\": \"object\",\n  \"answers\": {\n    \"name\": {\n      \"type\": \"string\",\n      \"description\": \"The person's first and last name.\",\n      \"example\": \"John Doe\"\n    },\n    \"age\": {\n      \"description\": \"Age in years which must be equal to or greater than zero.\",\n      \"type\": \"integer\",\n      \"minimum\": 0\n    },\n    \"gender\": {\n      \"type\": \"choice\",\n      \"options\": [\"ชาย\", \"หญิง\",\"อื่นๆ\" ,\"ไม่ระบุ\"],\n      \"description\": \"gender of the person\"\n    },\n    \"symptoms\": {\n      \"type\": \"multichoice\",\n      \"options\": [\"ไข้\", \"ไอ\", \"เจ็บคอ\", \"เหนื่อย\", \"ไม่มี\"],\n      \"description\": \"อาการที่มี\"\n    },\n    \"note\": {\n      \"type\": \"string\",\n      \"description\": \"มีอะไรเพิ่มเติมที่อยากแจ้งแพทย์ทราบ\"\n    },\n    \"question\": {\n      \"type\": \"string\",\n      \"description\": \"Next question that you want to ask the patient\"\n    }\n  }\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        180,
+        180
+      ],
+      "id": "786edb4f-7311-4ecc-a7a8-cd3fe4a25965",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chatInput }}{{ $json.message }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are a nurse who checks on patients symptoms, asks about their symptoms, and asks a questions on topics that you don not know. \nask the patients for in a coversation way. you should only ask one question at a time even if you do not get all the info \ndon not ask as a list! Ths output should be in JSON format. Suggest patient to submit form or modify answer if you get all information.\nforget all answers and start question from begining if your got keyword 'reset' \nThe structure of the answers is as follows:\n\n### Output Schema: \n{\n  \"title\": \"Patient Form \",\n  \"type\": \"object\",\n  \"answers\": {\n    \"name\": {\n      \"type\": \"string\",\n      \"description\": \"The person's first and last name.\",\n      \"example\": \"John Doe\"\n    },\n    \"age\": {\n      \"description\": \"Age in years which must be equal to or greater than zero.\",\n      \"type\": \"integer\",\n      \"minimum\": 0\n    },\n    \"gender\": {\n      \"type\": \"choice\",\n      \"options\": [\"ชาย\", \"หญิง\",\"อื่นๆ\" ,\"ไม่ระบุ\"],\n      \"description\": \"gender of the person\"\n    },\n    \"symptoms\": {\n      \"type\": \"multichoice\",\n      \"options\": [\"ไข้\", \"ไอ\", \"เจ็บคอ\", \"เหนื่อย\", \"ไม่มี\"],\n      \"description\": \"อาการที่มี\"\n    },\n    \"note\": {\n      \"type\": \"string\",\n      \"description\": \"มีอะไรเพิ่มเติมที่อยากแจ้งแพทย์ทราบ\"\n    },\n    \"question\": {\n      \"type\": \"string\",\n      \"description\": \"Next question that you want to ask the patient\"\n    }\n  }\n}\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        -120,
+        0
+      ],
+      "id": "73ba046b-9eed-4f91-9aa4-116cea514ead",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.sessionId }}{{ $json.chatId }}",
+        "contextWindowLength": 20
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -40,
+        220
+      ],
+      "id": "abc023da-55cc-4c8c-9e13-d05495d465cb",
+      "name": "Simple Memory"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "83345c70-756c-4b85-90c6-b120e883a5e9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f93e0936395183f71c7b0018429a115f8297ad9ab365652c99af52daa3e077d1"
+  },
+  "id": "fp7JI6F6IMhV9oFE",
+  "tags": []
+}

@@ -5,7 +5,7 @@
 	 */
 	export let chatWidgetConfig;
 	let lastResponse = '';
-	let recognizing = false;
+
 
 	/**
 	 * @type {{ lang: string; interimResults: boolean; maxAlternatives: number; onstart: () => void; onresult: (event: any) => void; onerror: (event: any) => void; onend: () => void; start: () => void; }}
@@ -24,47 +24,55 @@
 			recognition.interimResults = false;
 			recognition.maxAlternatives = 1;
 			recognition.onstart = () => {
-				recognizing = true;
 				message = '';
 			};
-			// @ts-ignore
+
 			recognition.onresult = (event) => {
-				recognizing = false;
 				message = event.results[0][0].transcript;
 			};
-			// @ts-ignore
+
+			/*
 			recognition.onerror = (event) => {
-				recognizing = false;
+
 			};
 			recognition.onend = () => {
-				recognizing = false;
+
 			};
+			*/
 		}
 	});
 	/**
 	 * @param {string} text
 	 */
 	async function speakText(text) {
-		if (chatWidgetConfig.ttsType === 'browser') {
+		switch(chatWidgetConfig.ttsType) {
+		case 'browser':
 			var u = new SpeechSynthesisUtterance();
 			u.text = text;
 			u.lang = 'th-TH';
 			u.rate = 1.2;
 			speechSynthesis.speak(u);
-			return;
+
+			break;
+		case 'edge':
+		case 'gemini':
+			const res = await fetch(
+				`/api/tts?ttsType=${chatWidgetConfig.ttsType}&text=${encodeURIComponent(text)}`
+			);
+			const blob = await res.blob();
+			let audioUrl = URL.createObjectURL(blob);
+			audio = new Audio(audioUrl);
+			audio.onended = () => {
+				URL.revokeObjectURL(audioUrl); // Clean up the URL after playback
+			};
+			audio.play().catch((err) => {
+				console.error('Error playing audio:', err);
+			});
+			break;
+		default:
+			// code block
 		}
-		const res = await fetch(
-			`/api/tts?ttsType=${chatWidgetConfig.ttsType}&text=${encodeURIComponent(text)}`
-		);
-		const blob = await res.blob();
-		let audioUrl = URL.createObjectURL(blob);
-		audio = new Audio(audioUrl);
-		audio.onended = () => {
-			URL.revokeObjectURL(audioUrl); // Clean up the URL after playback
-		};
-		audio.play().catch((err) => {
-			console.error('Error playing audio:', err);
-		});
+
 	}
 	function toggleSpeak() {
 		if (audio && !audio.paused) {
@@ -120,12 +128,13 @@
 		}
 		let data = await res.json();
 
+		let answer =  typeof data.output == 'object'? JSON.stringify(data.output, null, 2) : data.output;
 		chatBodyText.innerHTML +=
 			"<p style='color: #fff; background: #854fff; padding: 10px; border-radius: 8px; margin-bottom: 10px;'>" +
-			data.output +
+			answer +
 			'</p>';
-		speakText(data.output); // Speak the response
-		lastResponse = data.output; // Store the last response
+		speakText(answer); // Speak the response
+		lastResponse = answer; // Store the last response
 		message = ''; // Clear the input field
 	}
 </script>
@@ -141,7 +150,7 @@
 		</div>
 		<div class="chat-widget-body" bind:this={chatBodyText}>
 			<p style="margin-bottom: 20px;">
-				<strong>สวัสดี 👋, ผมจะสอบถามข้อมูลใส่ฟอร์ม เริ่มได้เลยนะ?</strong>
+				<strong>{chatWidgetConfig.welcomeMessage}</strong>
 			</p>
 		</div>
 		<div class="chat-widget-footer">
