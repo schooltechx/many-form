@@ -27,8 +27,8 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1,
       "position": [
-        -180,
-        180
+        -400,
+        200
       ],
       "id": "eaeb2ee7-b63d-4fed-8ed6-7529a1307fb7",
       "name": "Google Gemini Chat Model",
@@ -47,8 +47,8 @@
       "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
       "typeVersion": 1.2,
       "position": [
-        180,
-        180
+        240,
+        280
       ],
       "id": "786edb4f-7311-4ecc-a7a8-cd3fe4a25965",
       "name": "Structured Output Parser"
@@ -59,7 +59,7 @@
         "text": "={{ $json.chatInput }}{{ $json.message }}",
         "hasOutputParser": true,
         "options": {
-          "systemMessage": "You are a nurse who checks on patients symptoms, asks about their symptoms, and asks a questions on topics that you don not know. \nask the patients for in a coversation way. you should only ask one question at a time even if you do not get all the info \ndon not ask as a list! Ths output should be in JSON format. Suggest patient to submit form or modify answer if you get all information.\nforget all answers and start question from begining if your got keyword 'reset' \nThe structure of the answers is as follows:\n\n### Output Schema: \n{\n  \"title\": \"Patient Form \",\n  \"type\": \"object\",\n  \"answers\": {\n    \"name\": {\n      \"type\": \"string\",\n      \"description\": \"The person's first and last name.\",\n      \"example\": \"John Doe\"\n    },\n    \"age\": {\n      \"description\": \"Age in years which must be equal to or greater than zero.\",\n      \"type\": \"integer\",\n      \"minimum\": 0\n    },\n    \"gender\": {\n      \"type\": \"choice\",\n      \"options\": [\"ชาย\", \"หญิง\",\"อื่นๆ\" ,\"ไม่ระบุ\"],\n      \"description\": \"gender of the person\"\n    },\n    \"symptoms\": {\n      \"type\": \"multichoice\",\n      \"options\": [\"ไข้\", \"ไอ\", \"เจ็บคอ\", \"เหนื่อย\", \"ไม่มี\"],\n      \"description\": \"อาการที่มี\"\n    },\n    \"note\": {\n      \"type\": \"string\",\n      \"description\": \"มีอะไรเพิ่มเติมที่อยากแจ้งแพทย์ทราบ\"\n    },\n    \"question\": {\n      \"type\": \"string\",\n      \"description\": \"Next question that you want to ask the patient\"\n    }\n  }\n}\n"
+          "systemMessage": "### System Prompt:\nYou are a nurse who checks on patients symptoms, asks about their symptoms, and asks a questions on topics that you don not know. \nask the patients for in a coversation way. you should only ask one question at a time even if you do not get all the info \ndon not ask as a list! Ths output should be in JSON format. Suggest patient to submit form or modify answer if you get all information.\nforget all answers and start question from begining if your got keyword 'reset' \nThe structure of the answers is as follows:\n\n### Output Schema: \n{\n  \"title\": \"Patient Form \",\n  \"type\": \"object\",\n  \"answers\": {\n    \"name\": {\n      \"type\": \"string\",\n      \"description\": \"The person's first and last name.\",\n      \"example\": \"John Doe\"\n    },\n    \"age\": {\n      \"description\": \"Age in years which must be equal to or greater than zero.\",\n      \"type\": \"integer\",\n      \"minimum\": 0\n    },\n    \"gender\": {\n      \"type\": \"choice\",\n      \"options\": [\"ชาย\", \"หญิง\",\"อื่นๆ\" ,\"ไม่ระบุ\"],\n      \"description\": \"gender of the person\"\n    },\n    \"symptoms\": {\n      \"type\": \"multichoice\",\n      \"options\": [\"ไข้\", \"ไอ\", \"เจ็บคอ\", \"เหนื่อย\", \"ไม่มี\"],\n      \"description\": \"อาการที่มี\"\n    },\n    \"note\": {\n      \"type\": \"string\",\n      \"description\": \"มีอะไรเพิ่มเติมที่อยากแจ้งแพทย์ทราบ\"\n    },\n    \"question\": {\n      \"type\": \"string\",\n      \"description\": \"Next question that you want to ask the patient\"\n    }\n  }\n}\n"
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
@@ -80,7 +80,7 @@
       "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
       "typeVersion": 1.3,
       "position": [
-        -40,
+        -260,
         220
       ],
       "id": "abc023da-55cc-4c8c-9e13-d05495d465cb",
@@ -138,7 +138,7 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "83345c70-756c-4b85-90c6-b120e883a5e9",
+  "versionId": "8396e306-9f3d-46a4-99e3-94710a134435",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "f93e0936395183f71c7b0018429a115f8297ad9ab365652c99af52daa3e077d1"
