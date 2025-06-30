@@ -1,78 +1,57 @@
-<script>
+<script lang="ts">
 	import { onMount } from 'svelte';
-	/**
-	 * @type {import("./types").ChatWidgetConfig}
-	 */
-	export let chatWidgetConfig;
+	import type { ChatWidgetConfig } from '$lib/components/types';
+	export let chatWidgetConfig: ChatWidgetConfig;
 	let lastResponse = '';
-
-
-	/**
-	 * @type {{ lang: string; interimResults: boolean; maxAlternatives: number; onstart: () => void; onresult: (event: any) => void; onerror: (event: any) => void; onend: () => void; start: () => void; }}
-	 */
-	let recognition;
-	/**
-	 * @type {HTMLAudioElement}
-	 */
-	let audio;
+	let recognition: SpeechRecognition
+	let audio: HTMLAudioElement;
 	onMount(() => {
-		if ('speechRecognition' in window || 'webkitSpeechRecognition' in window) {
-			// @ts-ignore
-			const SpeechRecognition = window.speechRecognition || window.webkitSpeechRecognition;
-			recognition = new SpeechRecognition();
-			recognition.lang = 'th-TH';
-			recognition.interimResults = false;
-			recognition.maxAlternatives = 1;
-			recognition.onstart = () => {
-				message = '';
-			};
+		const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+		if (!SpeechRecognition) return;
 
-			recognition.onresult = (event) => {
-				message = event.results[0][0].transcript;
-			};
+		recognition = new SpeechRecognition();
+		recognition.lang = 'th-TH';
+		recognition.interimResults = false;
+		recognition.maxAlternatives = 1;
+		recognition.onstart = () => {
+			chatInput = 'กำลังถอดเสียง ...';
+		};
 
-			/*
-			recognition.onerror = (event) => {
+		recognition.onresult = (event) => {
+			chatInput = event.results[0][0].transcript;
+		};
 
-			};
-			recognition.onend = () => {
-
-			};
-			*/
-		}
+		// recognition.onerror = (event) => {};
+		// recognition.onend = () => {};
 	});
-	/**
-	 * @param {string} text
-	 */
-	async function speakText(text) {
-		switch(chatWidgetConfig.ttsType) {
-		case 'browser':
-			var u = new SpeechSynthesisUtterance();
-			u.text = text;
-			u.lang = 'th-TH';
-			u.rate = 1.2;
-			speechSynthesis.speak(u);
+	async function speakText(text: string) {
+		switch (chatWidgetConfig.ttsType) {
+			case 'browser':
+				var u = new SpeechSynthesisUtterance();
+				u.text = text;
+				u.lang = 'th-TH';
+				u.rate = 1.2;
+				speechSynthesis.speak(u);
 
-			break;
-		case 'edge':
-		case 'gemini':
-			const res = await fetch(
-				`/api/tts?ttsType=${chatWidgetConfig.ttsType}&text=${encodeURIComponent(text)}`
-			);
-			const blob = await res.blob();
-			let audioUrl = URL.createObjectURL(blob);
-			audio = new Audio(audioUrl);
-			audio.onended = () => {
-				URL.revokeObjectURL(audioUrl); // Clean up the URL after playback
-			};
-			audio.play().catch((err) => {
-				console.error('Error playing audio:', err);
-			});
-			break;
-		default:
+				break;
+			case 'edge':
+			case 'gemini':
+				const res = await fetch(
+					`/api/tts?ttsType=${chatWidgetConfig.ttsType}&text=${encodeURIComponent(text)}`
+				);
+				const blob = await res.blob();
+				let audioUrl = URL.createObjectURL(blob);
+				audio = new Audio(audioUrl);
+				audio.onended = () => {
+					URL.revokeObjectURL(audioUrl); // Clean up the URL after playback
+				};
+				audio.play().catch((err) => {
+					console.error('Error playing audio:', err);
+				});
+				break;
+			default:
 			// code block
 		}
-
 	}
 	function toggleSpeak() {
 		if (audio && !audio.paused) {
@@ -85,39 +64,21 @@
 		recognition.start();
 	}
 	let showChatPanel = false;
-	let message = '';
-
-	/**
-	 * @type {HTMLDivElement}
-	 */
-	let chatBodyText;
-	// Function to generate or retrieve a unique chat ID
-	function getChatId() {
-		let chatId = sessionStorage.getItem('chatId');
-		if (!chatId) {
-			chatId = 'chat_' + Math.random().toString(36).substr(2, 9); // Unique ID
-			sessionStorage.setItem('chatId', chatId);
-		}
-		return chatId;
-	}
+	let chatInput = '';
+	let chatBodyText: HTMLDivElement;
 	function toggleChat() {
 		showChatPanel = !showChatPanel;
 	}
 	async function send() {
-		if (message.trim() === '') return;
+		if (chatInput.trim() === '') return;
 		chatBodyText.innerHTML +=
 			"<p style='color: #333; background: #f1f1f1; padding: 10px; border-radius: 8px; margin-bottom: 10px;'>" +
-			message +
+			chatInput +
 			'</p>';
-		let chatId = getChatId(); // Retrieve the session chat ID
-		let res = await fetch(chatWidgetConfig.webhook.url, {
+		let res = await fetch('/api/chat', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				chatId: chatId, // Attach chat ID for memory tracking
-				message: message,
-				route: chatWidgetConfig.webhook.route
-			})
+			body: JSON.stringify({chatInput})
 		});
 		if (!res.ok) {
 			chatBodyText.innerHTML +=
@@ -127,15 +88,15 @@
 			return;
 		}
 		let data = await res.json();
-
-		let answer =  typeof data.output == 'object'? JSON.stringify(data.output, null, 2) : data.output;
+		let answer =
+			typeof data.output == 'object' ? JSON.stringify(data.output, null, 2) : data.output;
 		chatBodyText.innerHTML +=
 			"<p style='color: #fff; background: #854fff; padding: 10px; border-radius: 8px; margin-bottom: 10px;'>" +
 			answer +
 			'</p>';
 		speakText(answer); // Speak the response
 		lastResponse = answer; // Store the last response
-		message = ''; // Clear the input field
+		chatInput = ''; // Clear the input field
 	}
 </script>
 
@@ -157,7 +118,7 @@
 			<input
 				type="text"
 				class="chat-widget-input"
-				bind:value={message}
+				bind:value={chatInput}
 				placeholder="Type your message here..."
 			/>
 			<button class="chat-widget-send" on:click={send}>⌯⌲</button>

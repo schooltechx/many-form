@@ -1,8 +1,4 @@
 export type ChatWidgetConfig = {
-	webhook: {
-		url: string;
-		route: string;
-	};
 	ttsType: string;
 	welcomeMessage: string;
 	style: {

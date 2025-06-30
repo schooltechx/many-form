@@ -1,14 +1,10 @@
-<script>
-	import { env } from '$env/dynamic/public';
+<script lang='ts'>
 	import ChatWidget from '$lib/components/ChatWidget.svelte';
-	/** @type {import('$lib/components/types').ChatWidgetConfig} */
-	let chatWidgetConfig = {
-		webhook: {
-			url: env.PUBLIC_N8N_CHAT_URL,
-			route: 'general'
-		},
-		ttsType: 'edge',
-		welcomeMessage:"สวัสดี 👋, ถ้าจะคุยกับผม เริ่มได้เลยนะ?", 
+	import type { ChatWidgetConfig } from '$lib/components/types';
+
+	let chatWidgetConfig:ChatWidgetConfig = {
+		ttsType: 'none',
+		welcomeMessage:"สวัสดี 👋, เริ่มคุยกันนะ?", 
 		style: {
 			primaryColor: '#854fff',
 			secondaryColor: '#6b3fd4',
@@ -19,25 +15,22 @@
 	};
 	const options = [
 		{
-			value: 'edge',
-			label: 'Eddge TTS'
+			id: 'none',
+			name: 'Disable'
+		},
+	 	{
+			id: 'edge',
+			name: 'Edge'
 		},
 		{
-			value: 'gemini',
-			label: 'gemini-2.5-flash-preview-tts'
+			id: 'gemini',
+			name: 'gemini-2.5-flash-preview-tts'
 		},
 		{
-			value: 'browser',
-			label: 'Browser'
+			id: 'browser',
+			name: 'Browser'
 		}
 	];
-
-	/**
-	 * @param {{ currentTarget: { value: string; }; }} event
-	 */
-	function onChange(event) {
-		chatWidgetConfig.ttsType = event.currentTarget.value;
-	}
 </script>
 
 <h1>My Web</h1>
@@ -45,33 +38,16 @@
 	กดปุ่ม 💬 (ล่างขวา) เพื่อเปิดแชทวิดเจ็ต
 	<h2>Text To Speech</h2>
 	<div>
+	{#each options as item (item.id)}
 		<label>
 			<input
-				checked={chatWidgetConfig.ttsType === 'edge'}
-				on:change={onChange}
+				bind:group={chatWidgetConfig.ttsType}
 				type="radio"
 				name="tts"
-				value="edge"
-			/> Edge TTS
+				value={item.id}
+			/> {item.name}
 		</label>
-		<label>
-			<input
-				checked={chatWidgetConfig.ttsType === 'gemini'}
-				on:change={onChange}
-				type="radio"
-				name="tts"
-				value="gemini"
-			/> Gemini TTS
-		</label>
-		<label>
-			<input
-				checked={chatWidgetConfig.ttsType === 'browser'}
-				on:change={onChange}
-				type="radio"
-				name="tts"
-				value="browser"
-			/> Browser TTS
-		</label>
+	{/each}
 	</div>
 	<ChatWidget {chatWidgetConfig} />
 </div>

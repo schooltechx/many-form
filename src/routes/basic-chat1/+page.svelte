@@ -1,8 +1,8 @@
 <script>
-	import { env } from '$env/dynamic/public';
 	import { onMount } from 'svelte';
 	let speechSynthesisLoading = true;
 	let lastResponse = ''
+	let n8nChatUrl='http://localhost:5678/webhook/10106cc5-e735-4399-b6bf-9e0f0dd3f89e/chat'
 	/**
 	 * @type {SpeechSynthesisVoice[]}
 	 */
@@ -67,7 +67,7 @@
 	}
 	let ChatWidgetConfig = {
 		webhook: {
-			url: env.PUBLIC_N8N_CHAT_URL,
+			url: n8nChatUrl,
 			route: 'general'
 		},
 		style: {
@@ -80,10 +80,13 @@
 	};
 	let showChatPanel = false;
 	let message = '';
-	// @ts-ignore
+
+	/**
+	 * @type {HTMLDivElement}
+	 */
 	let chatBodyText;
 	// Function to generate or retrieve a unique chat ID
-	// @ts-ignore
+
 	function getChatId() {
 		let chatId = sessionStorage.getItem('chatId');
 		if (!chatId) {
@@ -107,8 +110,8 @@
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				chatId: chatId, // Attach chat ID for memory tracking
-				message: message,
+				sessionId: chatId, // Attach chat ID for memory tracking
+				chatInput: message,
 				route: ChatWidgetConfig.webhook.route
 			})
 		});
@@ -133,34 +136,31 @@
 	}
 </script>
 
-<h1>ฟอร์มเยอะ</h1>
+<h1>Basic Chat</h1>
+N8N Chat URL:
+<input
+	type="text"
+	bind:value={n8nChatUrl}
+	placeholder="n8nChat URL"
+	style="width: 80%; padding: 8px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 10px;">
 
-<p>แสดงฟอร์มตรงนี้</p>
-<form>
-	<label for="name">ชื่อ นามสกุล:</label>
-	<input type="text" id="name" name="name" required placeholder="สมชาย ฟอร์มเยอะ" />
-	<br />
-	<label for="email">อีเมลล์:</label>
-	<input type="email" id="email" name="email" required placeholder="form@domain.com" />
-	<br />
-	<textarea id="message" name="message" placeholder="ใส่คำติชม"></textarea>
-	<br />
-	<label for="gender">อีเมลล์:</label>
-	<select name="gender">
-		<option value="male">ชาย</option>
-		<option selected value="femail">หญิง</option>
-	</select>
-	<br />
-	<button type="submit">ส่ง</button>
-</form>
+<div>
+	<ul>
+		<li>ตัวอย่างต้นแบบแชทวิดเจ็ตพื้นที่ใช้กับ N8N </li>
+		<li>มี TTS และ STT ใช้ build in ของ Browser</li>
+		<li>ใช้ JavaScript รวมทุกอย่างในไฟล์เดียว เพื่อการศึกษาเรียบง่าย</li>
+		<li>ไม่ปลอดภัยเพราะใช้ URL ของ N8N อยู่บน Client และต้องเปิด CORS</li>
+	</ul>
+	  
+</div>
 
-{#if showChatPanel}
+{#if !showChatPanel}
 	<button id="chat-widget-button" class="chat-widget-button" on:click={toggleChat}>💬</button>
 {:else}
 	<!-- Chat Widget -->
 	<div class="chat-widget-container">
 		<div class="chat-widget-header">
-			<span>Chat</span>
+			<span>Basic Chat</span>
 			<button class="chat-widget-send" on:click={toggleChat}>✖</button>
 		</div>
 		<div class="chat-widget-body" bind:this={chatBodyText}>
