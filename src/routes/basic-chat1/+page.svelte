@@ -9,7 +9,7 @@
 	let voices = [];
 	let recognizing = false
 	/**
-	 * @type {{ lang: string; interimResults: boolean; maxAlternatives: number; onstart: () => void; onresult: (event: any) => void; onerror: (event: any) => void; onend: () => void; start: () => void; }}
+	 * @type {SpeechRecognition}
 	 */
 	let recognition
 	onMount(() => {
@@ -18,7 +18,6 @@
 			voices = speechSynthesis.getVoices();
 			speechSynthesisLoading = false
 		});
-		// @ts-ignore
 		const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         recognition = new SpeechRecognition();
         recognition.lang = 'th-TH';

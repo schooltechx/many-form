@@ -13,7 +13,9 @@
 		"format": "prettier --write .",
 		"lint": "prettier --check . && eslint .",
 		"build:docker": "npm run build && docker build -t docker.frappet.com/demo/many-form .",
-		"push:docker": "npm run build:docker && docker push docker.frappet.com/demo/many-form"
+		"push:docker": "npm run build:docker && docker push docker.frappet.com/demo/many-form",
+		"reload:docker":"ssh -t dev-frappet 'cd ~/docker/workflow; docker compose pull;docker compose up -d'; touch success",
+		"deploy":"npm run push:docker && npm run reload:docker"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^1.2.5",

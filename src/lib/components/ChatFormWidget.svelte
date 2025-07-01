@@ -92,13 +92,20 @@
 		}
 		let data = await res.json();
 		
-		let answer =""
-		if(typeof data.output == 'object' && 'question' in data.output   ){
-			answer =  data.output.question
-			formData = data.output
-			console.log("Form Data",formData)
+		let answer ="Unexpect format"
+		if(typeof data.output !== 'object'){
+			console.log("Form Data not object",data.output)
 		}else{
-			console.log("Form Data incorrect",data.output)
+			if('question' in data.output){
+				answer =  data.output.question
+				formData = data.output
+			}else	
+			if('answers' in data.output){//somtime it answer in this format
+				answer =  data.output.answers.question
+				formData = data.output.answers
+			}else{
+				console.log("Form Data unexpect format",data.output)
+			}
 		}
 		
 		chatBodyText.innerHTML +=
@@ -172,8 +179,11 @@
 	.chat-widget-body {
 		flex: 1;
 		padding: 20px;
-		overflow-y: auto;
+		overflow-y: scroll;
+		flex-direction: column-reverse;
 		text-wrap: pretty;
+		overflow: auto;
+		overflow-anchor: auto !important; 
 	}
 	/* Increased spacing between messages */
 	.chat-widget-body p {

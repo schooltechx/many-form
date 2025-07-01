@@ -1,5 +1,5 @@
 services:
-  n8n-chat:
+  many-form:
     image: docker.frappet.com/demo/many-form
     ports:
         - 3000:3000
@@ -7,17 +7,16 @@ services:
       - TZ=${TIMEZONE}
       - PUBLIC_N8N_CHAT_URL=${PUBLIC_N8N_CHAT_URL}
       - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - N8N_CHAT_URL=${N8N_CHAT_URL}
+      - N8N_CHAT_FORM_URL=${N8N_CHAT_FORM_URL}
 
   n8n:
-    image: n8nio/n8n:latest
+    image: n8nio/n8n:1.101.0
     container_name: n8n
     restart: always
     ports:
       - "5678:5678"
     environment:
-      # - N8N_BASIC_AUTH_ACTIVE=true
-      # - N8N_BASIC_AUTH_USER=${N8N_BASIC_AUTH_USER}
-      # - N8N_BASIC_AUTH_PASSWORD=${N8N_BASIC_AUTH_PASSWORD}
       - N8N_HOST=0.0.0.0
       - N8N_SECURE_COOKIE=false
       - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true

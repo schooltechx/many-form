@@ -35,6 +35,6 @@ export const POST: RequestHandler = async ({ request,cookies }) => {
 		return json({ error: 'Failed to process chat input' }, { status: res.status });
 	}
   const n8nResponse = await res.json()
-  console.log("N8N Response",n8nResponse)
+  console.log("N8N Response",JSON.stringify(n8nResponse,null,2) )
 	return json(n8nResponse)
 };
