@@ -14,7 +14,7 @@
 		"lint": "prettier --check . && eslint .",
 		"docker:build": "npm run build && docker build -t many-form .",
 		"remote:push": "docker save many-form | bzip2 | ssh remote-host docker load",
-		"remote:reload": "ssh -t remote-host 'cd ~/docker/workflow; docker compose down many-form;docker compose up -d many-form'; date> many-form",
+		"remote:reload": "ssh -t remote-host 'cd ~/docker/workflow; docker compose down many-form;docker compose up -d many-form; date> many-form'",
 		"deploy": "npm run docker:build && npm run remote:push && npm run remote:reload"
 	},
 	"devDependencies": {
