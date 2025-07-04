@@ -12,10 +12,10 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"format": "prettier --write .",
 		"lint": "prettier --check . && eslint .",
-		"build:docker": "npm run build && docker build -t docker.frappet.com/demo/many-form .",
-		"push:docker": "npm run build:docker && docker push docker.frappet.com/demo/many-form",
-		"reload:docker":"ssh -t dev-frappet 'cd ~/docker/workflow; docker compose pull;docker compose up -d'; touch success",
-		"deploy":"npm run push:docker && npm run reload:docker"
+		"docker:build": "npm run build && docker build -t many-form .",
+		"remote:push": "docker save many-form | bzip2 | ssh remote-host docker load",
+		"remote:reload": "ssh -t remote-host 'cd ~/docker/workflow; docker compose down many-form;docker compose up -d many-form'; date> many-form",
+		"deploy": "npm run docker:build && npm run remote:push && npm run remote:reload"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^1.2.5",

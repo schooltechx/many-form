@@ -1,0 +1,11 @@
+## Test Submit form
+PUT http://localhost:5678/webhook/patient-form HTTP/1.1
+content-type: application/json
+
+{
+    "name": "Sorawit Bholsithi",
+    "age": 15,
+    "gender": "male",
+    "syntoms":["ไข้","ไอ"],
+    "note":"Hi hi "
+}

@@ -1,10 +1,10 @@
-<script lang='ts'>
+<script lang="ts">
 	import ChatWidget from '$lib/components/ChatWidget.svelte';
 	import type { ChatWidgetConfig } from '$lib/components/types';
 
-	let chatWidgetConfig:ChatWidgetConfig = {
+	let chatWidgetConfig: ChatWidgetConfig = {
 		ttsType: 'none',
-		welcomeMessage:"สวัสดี 👋, เริ่มคุยกันนะ?", 
+		welcomeMessage: 'สวัสดี 👋, เริ่มคุยกันนะ?',
 		style: {
 			primaryColor: '#854fff',
 			secondaryColor: '#6b3fd4',
@@ -18,7 +18,7 @@
 			id: 'none',
 			name: 'Disable'
 		},
-	 	{
+		{
 			id: 'edge',
 			name: 'Edge'
 		},
@@ -38,16 +38,12 @@
 	กดปุ่ม 💬 (ล่างขวา) เพื่อเปิดแชทวิดเจ็ต
 	<h2>Text To Speech</h2>
 	<div>
-	{#each options as item (item.id)}
-		<label>
-			<input
-				bind:group={chatWidgetConfig.ttsType}
-				type="radio"
-				name="tts"
-				value={item.id}
-			/> {item.name}
-		</label>
-	{/each}
+		{#each options as item (item.id)}
+			<label>
+				<input bind:group={chatWidgetConfig.ttsType} type="radio" name="tts" value={item.id} />
+				{item.name}
+			</label>
+		{/each}
 	</div>
 	<ChatWidget {chatWidgetConfig} />
 </div>

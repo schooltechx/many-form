@@ -27,7 +27,7 @@ The structure of the answers is as follows:
     },
     "symptoms": {
       "type": "multichoice",
-      "options": ["ไข้", "ไอ", "เจ็บคอ", "เหนื่อย", "ไม่มี"],
+      "options": ["ไข้", "ไอ", "เจ็บคอ", "เหนื่อย", "ปวดศีรษะ"],
       "description": "อาการที่มี"
     },
     "note": {

@@ -5,11 +5,12 @@
 	export let formData: object = {};
 	// let { formData = $bindable()} = $props();
 	let lastResponse = '';
-	let recognition: SpeechRecognition
+	let recognition: SpeechRecognition;
 	let audio: HTMLAudioElement;
+	let recognizing = false;
 	onMount(() => {
 		const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-			// (window as any).speechRecognition || (window as any).webkitSpeechRecognition;
+		// (window as any).speechRecognition || (window as any).webkitSpeechRecognition;
 		if (!SpeechRecognition) return;
 
 		recognition = new SpeechRecognition();
@@ -18,14 +19,18 @@
 		recognition.maxAlternatives = 1;
 		recognition.onstart = () => {
 			chatInput = 'กำลังถอดเสียง ...';
+			recognizing = true;
 		};
-
 		recognition.onresult = (event) => {
 			chatInput = event.results[0][0].transcript;
+			recognizing = false;
 		};
-
-		// recognition.onerror = (event) => {};
-		// recognition.onend = () => {};
+		recognition.onerror = (event) => {
+			recognizing = false;
+		};
+		recognition.onend = () => {
+			recognizing = false;
+		};
 	});
 	async function speakText(text: string) {
 		switch (chatWidgetConfig.ttsType) {
@@ -35,7 +40,6 @@
 				u.lang = 'th-TH';
 				u.rate = 1.2;
 				speechSynthesis.speak(u);
-
 				break;
 			case 'edge':
 			case 'gemini':
@@ -52,8 +56,7 @@
 					console.error('Error playing audio:', err);
 				});
 				break;
-			default:
-			// code block
+			default: //none (no TTS)
 		}
 	}
 	function toggleSpeak() {
@@ -64,7 +67,12 @@
 		}
 	}
 	function listen() {
-		recognition.start();
+		if (!recognizing) recognition.start();
+		else {
+			// stop before recognition
+			recognition.stop();
+			chatInput = '';
+		}
 	}
 	let showChatPanel = false;
 	let chatInput = '';
@@ -72,16 +80,24 @@
 	function toggleChat() {
 		showChatPanel = !showChatPanel;
 	}
-	async function send() {
-		if (chatInput.trim() === '') return;
-		chatBodyText.innerHTML +=
-			"<p style='color: #333; background: #f1f1f1; padding: 10px; border-radius: 8px; margin-bottom: 10px;'>" +
-			chatInput +
-			'</p>';
-		let res = await fetch('/api/chat', {
+	export async function reset() {
+		send('reset');
+	}
+
+	async function send(mode = 'normal') {
+		let chatMsg = mode === 'reset' ? 'reset' : chatInput.trim();
+		if (chatMsg === '') return;
+		if (mode !== 'reset') {
+			chatBodyText.innerHTML +=
+				"<p style='color: #333; background: #f1f1f1; padding: 10px; border-radius: 8px; margin-bottom: 10px;'>" +
+				chatMsg +
+				'</p>';
+		}
+
+		let res = await fetch('/api/patient', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({chatInput,backend:'form'})
+			body: JSON.stringify({ chatInput: chatMsg })
 		});
 		if (!res.ok) {
 			chatBodyText.innerHTML +=
@@ -91,23 +107,23 @@
 			return;
 		}
 		let data = await res.json();
-		
-		let answer ="Unexpect format"
-		if(typeof data.output !== 'object'){
-			console.log("Form Data not object",data.output)
-		}else{
-			if('question' in data.output){
-				answer =  data.output.question
-				formData = data.output
-			}else	
-			if('answers' in data.output){//somtime it answer in this format
-				answer =  data.output.answers.question
-				formData = data.output.answers
-			}else{
-				console.log("Form Data unexpect format",data.output)
+
+		let answer = 'Unexpect format';
+		if (typeof data.output !== 'object') {
+			console.log('Form Data not object', data.output);
+		} else {
+			if ('question' in data.output) {
+				answer = data.output.question;
+				formData = data.output;
+			} else if ('answers' in data.output) {
+				//somtime it answer in this format
+				answer = data.output.answers.question;
+				formData = data.output.answers;
+			} else {
+				console.log('Form Data unexpect format', data.output);
 			}
 		}
-		
+
 		chatBodyText.innerHTML +=
 			"<p style='color: #fff; background: #854fff; padding: 10px; border-radius: 8px; margin-bottom: 10px;'>" +
 			answer +
@@ -139,9 +155,9 @@
 				bind:value={chatInput}
 				placeholder="Type your message here..."
 			/>
-			<button class="chat-widget-send" on:click={send}>⌯⌲</button>
+			<button class="chat-widget-send" on:click={() => send()}>⌯⌲</button>
 			{#if recognition}
-				<button class="chat-widget-send" on:click={listen}>🎤</button>
+				<button class="chat-widget-send" on:click={listen} disabled={recognizing}>🎤</button>
 			{/if}
 			{#if chatWidgetConfig.ttsType}
 				<button class="chat-widget-send" on:click={toggleSpeak}>⏯</button>
@@ -183,7 +199,7 @@
 		flex-direction: column-reverse;
 		text-wrap: pretty;
 		overflow: auto;
-		overflow-anchor: auto !important; 
+		overflow-anchor: auto !important;
 	}
 	/* Increased spacing between messages */
 	.chat-widget-body p {
@@ -214,6 +230,12 @@
 		border-radius: 8px;
 		cursor: pointer;
 	}
+	.chat-widget-send:hover {
+		background: #014a63;
+	}
+	.chat-widget-send:disabled {
+		background: #fafafa;
+	}
 	/* Make the chat bubble a perfect circle */
 	.chat-widget-button {
 		position: fixed;
@@ -232,5 +254,9 @@
 		align-items: center;
 		justify-content: center;
 		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+		cursor: pointer;
+	}
+	.chat-widget-button:hover {
+		background: #a7d0de;
 	}
 </style>

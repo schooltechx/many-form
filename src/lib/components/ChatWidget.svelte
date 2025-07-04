@@ -3,8 +3,9 @@
 	import type { ChatWidgetConfig } from '$lib/components/types';
 	export let chatWidgetConfig: ChatWidgetConfig;
 	let lastResponse = '';
-	let recognition: SpeechRecognition
+	let recognition: SpeechRecognition;
 	let audio: HTMLAudioElement;
+	let recognizing = false;
 	onMount(() => {
 		const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 		if (!SpeechRecognition) return;
@@ -15,14 +16,18 @@
 		recognition.maxAlternatives = 1;
 		recognition.onstart = () => {
 			chatInput = 'กำลังถอดเสียง ...';
+			recognizing = true;
 		};
-
 		recognition.onresult = (event) => {
 			chatInput = event.results[0][0].transcript;
+			recognizing = false;
 		};
-
-		// recognition.onerror = (event) => {};
-		// recognition.onend = () => {};
+		recognition.onerror = (event) => {
+			recognizing = false;
+		};
+		recognition.onend = () => {
+			recognizing = false;
+		};
 	});
 	async function speakText(text: string) {
 		switch (chatWidgetConfig.ttsType) {
@@ -61,7 +66,12 @@
 		}
 	}
 	function listen() {
-		recognition.start();
+		if (!recognizing) recognition.start();
+		else {
+			// stop before recognition
+			recognition.stop();
+			chatInput = '';
+		}
 	}
 	let showChatPanel = false;
 	let chatInput = '';
@@ -78,7 +88,7 @@
 		let res = await fetch('/api/chat', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({chatInput})
+			body: JSON.stringify({ chatInput })
 		});
 		if (!res.ok) {
 			chatBodyText.innerHTML +=

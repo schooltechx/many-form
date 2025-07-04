@@ -1,0 +1,7 @@
+.svelte-kit
+build
+.git/
+node_modules/
+docker
+n8n
+.*

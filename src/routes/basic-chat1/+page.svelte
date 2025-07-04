@@ -1,68 +1,66 @@
 <script>
 	import { onMount } from 'svelte';
 	let speechSynthesisLoading = true;
-	let lastResponse = ''
-	let n8nChatUrl='http://localhost:5678/webhook/10106cc5-e735-4399-b6bf-9e0f0dd3f89e/chat'
+	let lastResponse = '';
+	let n8nChatUrl = 'http://localhost:5678/webhook/10106cc5-e735-4399-b6bf-9e0f0dd3f89e/chat';
 	/**
 	 * @type {SpeechSynthesisVoice[]}
 	 */
 	let voices = [];
-	let recognizing = false
+	let recognizing = false;
 	/**
 	 * @type {SpeechRecognition}
 	 */
-	let recognition
+	let recognition;
 	onMount(() => {
 		// @ts-ignore
 		speechSynthesis.addEventListener('voiceschanged', (ev) => {
 			voices = speechSynthesis.getVoices();
-			speechSynthesisLoading = false
+			speechSynthesisLoading = false;
 		});
 		const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        recognition = new SpeechRecognition();
-        recognition.lang = 'th-TH';
-        recognition.interimResults = false;
-        recognition.maxAlternatives = 1;
-        recognition.onstart = () => {
-        	recognizing = true;
-			message = ''
-        };
-        // @ts-ignore
-        recognition.onresult = (event) => {
-        	recognizing = false;
-			message = event.results[0][0].transcript
-        };
+		recognition = new SpeechRecognition();
+		recognition.lang = 'th-TH';
+		recognition.interimResults = false;
+		recognition.maxAlternatives = 1;
+		recognition.onstart = () => {
+			recognizing = true;
+			message = '';
+		};
 		// @ts-ignore
-        recognition.onerror = (event) => {
-        	recognizing = false;
-        };
-        recognition.onend = () => {
-        	recognizing = false;
-        };
+		recognition.onresult = (event) => {
+			recognizing = false;
+			message = event.results[0][0].transcript;
+		};
+		// @ts-ignore
+		recognition.onerror = (event) => {
+			recognizing = false;
+		};
+		recognition.onend = () => {
+			recognizing = false;
+		};
 	});
-
 
 	/**
 	 * @param {string} text
 	 */
 	function speakText(text) {
-			const utter = new SpeechSynthesisUtterance(text);
-			const thaiVoice = voices.find((v) => v.lang.startsWith('th'));
-			if (thaiVoice) utter.voice = thaiVoice;
-			utter.lang = thaiVoice ? thaiVoice.lang : 'th-TH';
-			utter.rate = 1;
-			speechSynthesis.speak(utter);
+		const utter = new SpeechSynthesisUtterance(text);
+		const thaiVoice = voices.find((v) => v.lang.startsWith('th'));
+		if (thaiVoice) utter.voice = thaiVoice;
+		utter.lang = thaiVoice ? thaiVoice.lang : 'th-TH';
+		utter.rate = 1;
+		speechSynthesis.speak(utter);
 	}
-	function toggleSpeak(){
+	function toggleSpeak() {
 		if (speechSynthesis.speaking) {
 			speechSynthesis.cancel();
 		} else {
-			speakText(lastResponse.trim()|| 'No Chat response to speak');
+			speakText(lastResponse.trim() || 'No Chat response to speak');
 		}
 	}
 	function listen() {
-
-		recognition.start()
+		recognition.start();
 	}
 	let ChatWidgetConfig = {
 		webhook: {
@@ -141,16 +139,16 @@ N8N Chat URL:
 	type="text"
 	bind:value={n8nChatUrl}
 	placeholder="n8nChat URL"
-	style="width: 80%; padding: 8px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 10px;">
+	style="width: 80%; padding: 8px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 10px;"
+/>
 
 <div>
 	<ul>
-		<li>ตัวอย่างต้นแบบแชทวิดเจ็ตพื้นที่ใช้กับ N8N </li>
+		<li>ตัวอย่างต้นแบบแชทวิดเจ็ตพื้นที่ใช้กับ N8N</li>
 		<li>มี TTS และ STT ใช้ build in ของ Browser</li>
 		<li>ใช้ JavaScript รวมทุกอย่างในไฟล์เดียว เพื่อการศึกษาเรียบง่าย</li>
 		<li>ไม่ปลอดภัยเพราะใช้ URL ของ N8N อยู่บน Client และต้องเปิด CORS</li>
 	</ul>
-	  
 </div>
 
 {#if !showChatPanel}
@@ -174,8 +172,8 @@ N8N Chat URL:
 				bind:value={message}
 				placeholder="Type your message here..."
 			/>
-			<button class="chat-widget-send" on:click={send}>⌯⌲</button> 
-			<button class="chat-widget-send" on:click={listen}>🎤</button> 
+			<button class="chat-widget-send" on:click={send}>⌯⌲</button>
+			<button class="chat-widget-send" on:click={listen}>🎤</button>
 			<button class="chat-widget-send" on:click={toggleSpeak}>⏯</button>
 		</div>
 	</div>

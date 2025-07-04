@@ -1,0 +1,248 @@
+{
+	"name": "Patient Form",
+	"nodes": [
+		{
+			"parameters": {
+				"public": true,
+				"initialMessages": "วันนี้มีอาการอะไรบ้างค่ะ",
+				"options": {}
+			},
+			"type": "@n8n/n8n-nodes-langchain.chatTrigger",
+			"typeVersion": 1.1,
+			"position": [0, 0],
+			"id": "1e3016dd-095a-41c8-86af-b2e9d3ccfc89",
+			"name": "When chat message received",
+			"webhookId": "0efe5c69-6ed5-4345-99d0-1431beec6033"
+		},
+		{
+			"parameters": {
+				"hasOutputParser": true,
+				"options": {
+					"systemMessage": "### System Prompt:\nYou are a nurse who checks on patients symptoms, asks about their symptoms, and asks a questions on topics that you don not know. \nask the patients for in a coversation way. you should only ask one question at a time even if you do not get all the info \ndon not ask as a list! Ths output should be in JSON format. Suggest patient to submit form or modify answer if you get all information.\nforget all answers and start question from begining if your got keyword 'reset' \nThe structure of the answers is as follows:\n\n### Output Schema: \n{\n  \"title\": \"Patient Form \",\n  \"type\": \"object\",\n  \"answers\": {\n    \"name\": {\n      \"type\": \"string\",\n      \"description\": \"The person's first and last name.\",\n      \"example\": \"John Doe\"\n    },\n    \"age\": {\n      \"description\": \"Age in years which must be equal to or greater than zero.\",\n      \"type\": \"integer\",\n      \"minimum\": 0\n    },\n    \"gender\": {\n      \"type\": \"choice\",\n      \"options\": [\"ชาย\", \"หญิง\",\"อื่นๆ\" ,\"ไม่ระบุ\"],\n      \"description\": \"gender of the person\"\n    },\n    \"symptoms\": {\n      \"type\": \"multichoice\",\n      \"options\": [\"ไข้\", \"ไอ\", \"เจ็บคอ\", \"เหนื่อย\", \"ปวดศีรษะ\"],\n      \"description\": \"อาการที่มี\"\n    },\n    \"note\": {\n      \"type\": \"string\",\n      \"description\": \"มีอะไรเพิ่มเติมที่อยากแจ้งแพทย์ทราบ\"\n    },\n    \"question\": {\n      \"type\": \"string\",\n      \"description\": \"Next question that you want to ask the patient\"\n    }\n  }\n}\n"
+				}
+			},
+			"type": "@n8n/n8n-nodes-langchain.agent",
+			"typeVersion": 2,
+			"position": [220, 0],
+			"id": "b1f66a91-52b3-4cb8-a8e4-52bccc39a41b",
+			"name": "AI Agent",
+			"alwaysOutputData": true
+		},
+		{
+			"parameters": {
+				"options": {}
+			},
+			"type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+			"typeVersion": 1,
+			"position": [100, 200],
+			"id": "acbcb980-df45-45e2-858d-cdf70c29e236",
+			"name": "Google Gemini Chat Model",
+			"credentials": {
+				"googlePalmApi": {
+					"id": "KjH6hXYWKAB8vhNK",
+					"name": "Google Gemini(PaLM) Api account"
+				}
+			}
+		},
+		{
+			"parameters": {
+				"contextWindowLength": 10
+			},
+			"type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+			"typeVersion": 1.3,
+			"position": [220, 200],
+			"id": "c1d73c46-11e2-495e-804f-82dbe163d5de",
+			"name": "Simple Memory"
+		},
+		{
+			"parameters": {
+				"schemaType": "manual",
+				"inputSchema": "{\n  \"title\": \"Patient Form \",\n  \"type\": \"object\",\n  \"answers\": {\n    \"name\": {\n      \"type\": \"string\",\n      \"description\": \"The person's first and last name.\",\n      \"example\": \"John Doe\"\n    },\n    \"age\": {\n      \"description\": \"Age in years which must be equal to or greater than zero.\",\n      \"type\": \"integer\",\n      \"minimum\": 0\n    },\n    \"gender\": {\n      \"type\": \"choice\",\n      \"options\": [\"ชาย\", \"หญิง\",\"อื่นๆ\" ,\"ไม่ระบุ\"],\n      \"description\": \"gender of the person\"\n    },\n    \"symptoms\": {\n      \"type\": \"multichoice\",\n      \"options\": [\"ไข้\", \"ไอ\", \"เจ็บคอ\", \"เหนื่อย\", \"ปวดศีรษะ\"],\n      \"description\": \"อาการที่มี\"\n    },\n    \"note\": {\n      \"type\": \"string\",\n      \"description\": \"มีอะไรเพิ่มเติมที่อยากแจ้งแพทย์ทราบ\"\n    },\n    \"question\": {\n      \"type\": \"string\",\n      \"description\": \"Next question that you want to ask the patient\"\n    }\n  }\n}\n"
+			},
+			"type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+			"typeVersion": 1.3,
+			"position": [500, 160],
+			"id": "f09f2faf-d865-4dc8-95a7-24c586c77706",
+			"name": "Structured Output Parser"
+		},
+		{
+			"parameters": {
+				"httpMethod": "POST",
+				"path": "patient-form",
+				"options": {
+					"allowedOrigins": "*"
+				}
+			},
+			"type": "n8n-nodes-base.webhook",
+			"typeVersion": 2,
+			"position": [20, -220],
+			"id": "31c66719-55b4-4022-be17-7805c556f6a4",
+			"name": "Webhook",
+			"webhookId": "d61be48f-5bb9-4213-a652-fb9c8e75e7f9"
+		},
+		{
+			"parameters": {
+				"operation": "append",
+				"documentId": {
+					"__rl": true,
+					"value": "1g0T_drugFAj2nf7H4lhACbTefYsN2faSjKImDjuW2hc",
+					"mode": "list",
+					"cachedResultName": "patient",
+					"cachedResultUrl": "https://docs.google.com/spreadsheets/d/1g0T_drugFAj2nf7H4lhACbTefYsN2faSjKImDjuW2hc/edit?usp=drivesdk"
+				},
+				"sheetName": {
+					"__rl": true,
+					"value": "gid=0",
+					"mode": "list",
+					"cachedResultName": "patients",
+					"cachedResultUrl": "https://docs.google.com/spreadsheets/d/1g0T_drugFAj2nf7H4lhACbTefYsN2faSjKImDjuW2hc/edit#gid=0"
+				},
+				"columns": {
+					"mappingMode": "defineBelow",
+					"value": {
+						"name": "={{ $json.body.name }}",
+						"age": "={{ $json.body.age }}",
+						"gender": "={{ $json.body.gender }}",
+						"note": "={{ $json.body.note }}",
+						"symptoms": "={{ $json.body.symptoms.join(',') }}"
+					},
+					"matchingColumns": [],
+					"schema": [
+						{
+							"id": "name",
+							"displayName": "name",
+							"required": false,
+							"defaultMatch": false,
+							"display": true,
+							"type": "string",
+							"canBeUsedToMatch": true
+						},
+						{
+							"id": "age",
+							"displayName": "age",
+							"required": false,
+							"defaultMatch": false,
+							"display": true,
+							"type": "string",
+							"canBeUsedToMatch": true
+						},
+						{
+							"id": "gender",
+							"displayName": "gender",
+							"required": false,
+							"defaultMatch": false,
+							"display": true,
+							"type": "string",
+							"canBeUsedToMatch": true
+						},
+						{
+							"id": "symptoms",
+							"displayName": "symptoms",
+							"required": false,
+							"defaultMatch": false,
+							"display": true,
+							"type": "string",
+							"canBeUsedToMatch": true,
+							"removed": false
+						},
+						{
+							"id": "note",
+							"displayName": "note",
+							"required": false,
+							"defaultMatch": false,
+							"display": true,
+							"type": "string",
+							"canBeUsedToMatch": true
+						}
+					],
+					"attemptToConvertTypes": false,
+					"convertFieldsToString": false
+				},
+				"options": {}
+			},
+			"type": "n8n-nodes-base.googleSheets",
+			"typeVersion": 4.6,
+			"position": [240, -220],
+			"id": "9f206734-5e41-4439-866b-e034cfeae2eb",
+			"name": "Append row in sheet",
+			"credentials": {
+				"googleSheetsOAuth2Api": {
+					"id": "arWRsP2gXUSWhrn3",
+					"name": "Google Sheets account"
+				}
+			}
+		}
+	],
+	"pinData": {},
+	"connections": {
+		"When chat message received": {
+			"main": [
+				[
+					{
+						"node": "AI Agent",
+						"type": "main",
+						"index": 0
+					}
+				]
+			]
+		},
+		"Google Gemini Chat Model": {
+			"ai_languageModel": [
+				[
+					{
+						"node": "AI Agent",
+						"type": "ai_languageModel",
+						"index": 0
+					}
+				]
+			]
+		},
+		"Simple Memory": {
+			"ai_memory": [
+				[
+					{
+						"node": "AI Agent",
+						"type": "ai_memory",
+						"index": 0
+					}
+				]
+			]
+		},
+		"Structured Output Parser": {
+			"ai_outputParser": [
+				[
+					{
+						"node": "AI Agent",
+						"type": "ai_outputParser",
+						"index": 0
+					}
+				]
+			]
+		},
+		"Webhook": {
+			"main": [
+				[
+					{
+						"node": "Append row in sheet",
+						"type": "main",
+						"index": 0
+					}
+				]
+			]
+		},
+		"Append row in sheet": {
+			"main": [[]]
+		}
+	},
+	"active": true,
+	"settings": {
+		"executionOrder": "v1"
+	},
+	"versionId": "6f5e60ce-400c-479b-8db3-77eb62ee0293",
+	"meta": {
+		"templateCredsSetupCompleted": true,
+		"instanceId": "419a8d66e8c019dcefe5f6980f390bd8203d69003c8d6dab768493ac98d09adc"
+	},
+	"id": "wHpvCJIMZjnRMCcA",
+	"tags": []
+}
