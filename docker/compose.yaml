@@ -7,8 +7,9 @@ services:
       - TZ=${TIMEZONE}
       - GOOGLE_API_KEY=${GOOGLE_API_KEY}
       - N8N_CHAT_URL=${N8N_CHAT_URL}
-      - N8N_CHAT_FORM_URL=${N8N_CHAT_FORM_URL}
-
+      - N8N_PATIENT_FORM_CHAT_URL=${N8N_PATIENT_FORM_CHAT_URL}
+      - N8N_PATIENT_FORM_WEBHOOK_URL=${N8N_PATIENT_FORM_WEBHOOK_URL}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
   n8n:
     image: n8nio/n8n:1.101.0
     container_name: n8n

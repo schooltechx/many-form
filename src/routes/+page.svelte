@@ -5,7 +5,7 @@
 	<h2><a href="basic-chat1">Basic Chat 1</a></h2>
 	<div>
 		ตัวอย่างโปรแกรม Chat ที่ใช้ N8N เป็นเบื้องหลัง แสดงตัวอย่างการฝัง chat ในหน้าเวป ดัดแปลงมากจาก
-		[ตัวอย่างนี้](https://www.youtube.com/watch?v=0KR8e4WP0E0)
+		<a href="https://www.youtube.com/watch?v=0KR8e4WP0E0">ตัวอย่างนี้</a>
 		<ul>
 			<li>STT ใช้ window.SpeechRecognition เป็นของ Browser(ฟรี)</li>
 			<li>
@@ -38,7 +38,7 @@
 
 <style>
 	.container {
-		width: 800px;
+		width: 90%;
 		background: white;
 		margin: auto;
 		padding: 40px;
